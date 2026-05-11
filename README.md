@@ -6,18 +6,18 @@ A modern, responsive cafe management application built with **Blazor Server** an
 ![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet)
 ![Language](https://img.shields.io/badge/Language-C%23-239120?logo=csharp)
 
-## 🎯 Overview
+##  Overview
 
 Scandish is a full-stack cafe management platform that streamlines the entire customer experience—from browsing a dynamic menu to real-time order tracking—while providing kitchen staff with an efficient Kanban-style dashboard for order management.
 
 ### Key Highlights
-- ⚡ **Real-time Updates** using SignalR for instant order tracking
-- 📱 **Responsive Design** with Tailwind CSS custom design system
-- 🎨 **Modern UI Components** with "Cafe Espresso" aesthetic
-- 🔔 **Smart Notifications** with audio alerts for incoming orders
-- 💾 **Persistent Storage** using Entity Framework Core + PostgreSQL/SQLite
+-  **Real-time Updates** using SignalR for instant order tracking
+-  **Responsive Design** with Tailwind CSS custom design system
+-  **Modern UI Components** with "Cafe Espresso" aesthetic
+-  **Smart Notifications** with audio alerts for incoming orders
+-  **Persistent Storage** using Entity Framework Core + PostgreSQL/SQLite
 
-## 🚀 Features
+##  Features
 
 ### Customer Experience
 - **Smart Menu Display** - Categorized items with popular highlights and tag-based search
@@ -38,7 +38,7 @@ Scandish is a full-stack cafe management platform that streamlines the entire cu
 - **Category Organization** - Group items with custom tags and filters
 - **System Configuration** - Configure payment methods and subscription plans
 
-## 🛠 Tech Stack
+##  Tech Stack
 
 | Component | Technology |
 |-----------|-----------|
@@ -49,7 +49,7 @@ Scandish is a full-stack cafe management platform that streamlines the entire cu
 | **ORM** | Entity Framework Core 8 |
 | **Architecture** | Clean Architecture with Repository Pattern |
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 CafeManager/
@@ -90,7 +90,7 @@ CafeManager/
 └── Program.cs                    # Application startup configuration
 ```
 
-## 🏗 Architecture
+##  Architecture
 
 Scandish follows **Clean Architecture** principles with clear separation of concerns:
 
@@ -113,7 +113,7 @@ Scandish follows **Clean Architecture** principles with clear separation of conc
 - **Entity Framework** - ORM for database operations
 - **SignalR Hubs** - Real-time communication channels
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 - **.NET 8 SDK** ([Download](https://dotnet.microsoft.com/download/dotnet/8.0))
@@ -157,9 +157,9 @@ Scandish follows **Clean Architecture** principles with clear separation of conc
    ```
 
 6. **Access the application**
-   - 📱 Customer Menu: `http://localhost:5000`
-   - 👨‍💼 Admin Panel: `http://localhost:5000/manage`
-   - 👨‍🍳 Kitchen Queue: `http://localhost:5000/queue`
+   -  Customer Menu: `http://localhost:5000`
+   -  Admin Panel: `http://localhost:5000/kitchen`
+   -  Kitchen Queue: `http://localhost:5000/queue`
 
 ## 🔌 API Endpoints
 
@@ -195,7 +195,7 @@ PUT    /api/queue/{id}/status  - Update order status (Kitchen)
 GET    /api/queue/stats        - Get queue statistics
 ```
 
-## 💡 Developer Insights
+##  Developer Insights
 
 ### Real-time Engine (SignalR)
 SignalR manages WebSocket connections for instant updates across all connected clients. When an order status changes, notifications are broadcast to customers and kitchen staff simultaneously.
@@ -219,14 +219,14 @@ Menu item images are stored as Base64 strings in the database, eliminating the n
 - **Eager Loading** - `.Include()` prevents N+1 database problems
 - **Soft Deletes** - `IsDeleted` flag preserves data integrity
 
-## 🧪 Testing
+##  Testing
 
 Run unit tests:
 ```bash
 dotnet test
 ```
 
-## 📝 Database Schema
+##  Database Schema
 
 ### Core Tables
 - **Users** - Customer and staff accounts
@@ -238,7 +238,7 @@ dotnet test
 - **Payments** - Payment transaction records
 - **QueueEntries** - Real-time kitchen queue
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions are welcome! Here's how to get started:
 
@@ -254,13 +254,13 @@ Please ensure:
 - New features include appropriate error handling
 - Database changes include migrations
 
-## 📖 Documentation
+##  Documentation
 
 - [Project Summary](CafeManager/ProjectSummary.md) - Detailed technical breakdown
 - [Architecture Decisions](docs/ARCHITECTURE.md) - Design rationale (coming soon)
 - [API Documentation](docs/API.md) - Comprehensive endpoint reference (coming soon)
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### SignalR Connection Issues
 - Ensure WebSockets are enabled on your hosting environment
@@ -277,17 +277,17 @@ Please ensure:
 - Check browser console for JavaScript errors in `audio.js`
 - Verify user has interacted with the page before audio playback
 
-## 📄 License
+##  License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 👨‍💻 Author
+##  Author
 
 **Aiman Ali**
 - GitHub: [@SyedaAimanAli](https://github.com/SyedaAimanAli)
 - Email: aimanali122007@gmail.com
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - ASP.NET Core team for excellent documentation
 - SignalR for real-time capabilities
