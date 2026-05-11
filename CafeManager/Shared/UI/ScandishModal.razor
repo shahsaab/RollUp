@@ -1,0 +1,52 @@
+@if (IsOpen)
+{
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @onclick="Close"></div>
+        <div class="relative bg-white rounded-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl @MaxWidthClass">
+            @if (ShowHeader)
+            {
+                <div class="sticky top-0 z-10 bg-white border-b border-stone-200 px-6 py-4 flex items-center justify-between rounded-t-2xl">
+                    <h2 class="text-xl font-semibold text-cafe-espresso">
+                        @Title
+                    </h2>
+                    @if (ShowCloseButton)
+                    {
+                        <button @onclick="Close" class="p-2 hover:bg-stone-100 rounded-lg transition-colors text-stone-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    }
+                </div>
+            }
+
+            <div class="p-6">
+                @ChildContent
+            </div>
+            
+            @if (Footer != null)
+            {
+                <div class="sticky bottom-0 bg-stone-50 border-t border-stone-200 px-6 py-4 rounded-b-2xl">
+                    @Footer
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? Footer { get; set; }
+    [Parameter] public bool ShowHeader { get; set; } = true;
+    [Parameter] public bool ShowCloseButton { get; set; } = true;
+    [Parameter] public string MaxWidthClass { get; set; } = "max-w-2xl";
+
+    private async Task Close()
+    {
+        IsOpen = false;
+        await IsOpenChanged.InvokeAsync(false);
+    }
+}

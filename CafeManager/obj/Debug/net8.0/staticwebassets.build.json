@@ -1,0 +1,58 @@
+{
+  "Version": 1,
+  "Hash": "yQjAUFEd5WJaZF6/7HLaGgkP6bYvtxkApLp7Jko6WTI=",
+  "Source": "CafeManager",
+  "BasePath": "_content/CafeManager",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "CafeManager/wwwroot",
+      "Source": "CafeManager",
+      "ContentRoot": "/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/wwwroot/",
+      "BasePath": "_content/CafeManager",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/wwwroot/css/app.css",
+      "SourceId": "CafeManager",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/wwwroot/",
+      "BasePath": "_content/CafeManager",
+      "RelativePath": "css/app.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/css/app.css"
+    },
+    {
+      "Identity": "/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/wwwroot/js/audio.js",
+      "SourceId": "CafeManager",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/wwwroot/",
+      "BasePath": "_content/CafeManager",
+      "RelativePath": "js/audio.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/js/audio.js"
+    }
+  ]
+}

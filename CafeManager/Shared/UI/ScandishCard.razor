@@ -1,0 +1,30 @@
+<div class="@GetCardClass()">
+    @if (Header != null)
+    {
+        <div class="px-4 py-3 border-b border-stone-100 bg-stone-50/50">
+            @Header
+        </div>
+    }
+    <div class="p-4 @BodyClass">
+        @ChildContent
+    </div>
+    @if (Footer != null)
+    {
+        <div class="px-4 py-3 border-t border-stone-100 bg-stone-50/50 mt-auto">
+            @Footer
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public RenderFragment? Header { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? Footer { get; set; }
+    [Parameter] public string Class { get; set; } = string.Empty;
+    [Parameter] public string BodyClass { get; set; } = string.Empty;
+
+    private string GetCardClass()
+    {
+        return $"bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden flex flex-col {Class}";
+    }
+}

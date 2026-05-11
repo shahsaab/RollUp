@@ -1,0 +1,31 @@
+<span class="@GetBadgeClass()">
+    @if (DotColor != null)
+    {
+        <div class="w-2 h-2 rounded-full mr-2 @DotColor @(Pulse ? "animate-pulse" : "")"></div>
+    }
+    @ChildContent
+</span>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string Variant { get; set; } = "default"; // default, success, warning, danger, info
+    [Parameter] public string? DotColor { get; set; }
+    [Parameter] public bool Pulse { get; set; }
+    [Parameter] public string Class { get; set; } = string.Empty;
+
+    private string GetBadgeClass()
+    {
+        var baseClass = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ";
+        
+        var variantClass = Variant switch
+        {
+            "success" => "bg-emerald-100 text-emerald-800",
+            "warning" => "bg-amber-100 text-amber-800",
+            "danger" => "bg-red-100 text-red-800",
+            "info" => "bg-blue-100 text-blue-800",
+            _ => "bg-stone-100 text-stone-800"
+        };
+
+        return $"{baseClass} {variantClass} {Class}";
+    }
+}

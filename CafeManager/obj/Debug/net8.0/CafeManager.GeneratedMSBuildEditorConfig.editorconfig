@@ -1,0 +1,123 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = CafeManager
+build_property.RootNamespace = CafeManager
+build_property.ProjectDir = /home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = /home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager
+build_property._RazorSourceGeneratorDebug = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/Features/Admin/CategoryManagement.razor]
+build_metadata.AdditionalFiles.TargetPath = RmVhdHVyZXMvQWRtaW4vQ2F0ZWdvcnlNYW5hZ2VtZW50LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/Features/Admin/Components/DashboardStatsCard.razor]
+build_metadata.AdditionalFiles.TargetPath = RmVhdHVyZXMvQWRtaW4vQ29tcG9uZW50cy9EYXNoYm9hcmRTdGF0c0NhcmQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/Features/Admin/Components/MenuItemFormModal.razor]
+build_metadata.AdditionalFiles.TargetPath = RmVhdHVyZXMvQWRtaW4vQ29tcG9uZW50cy9NZW51SXRlbUZvcm1Nb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/Features/Admin/MenuManagement.razor]
+build_metadata.AdditionalFiles.TargetPath = RmVhdHVyZXMvQWRtaW4vTWVudU1hbmFnZW1lbnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/Features/CustomerMenu/Components/CartSidebar.razor]
+build_metadata.AdditionalFiles.TargetPath = RmVhdHVyZXMvQ3VzdG9tZXJNZW51L0NvbXBvbmVudHMvQ2FydFNpZGViYXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/Features/CustomerMenu/Components/CategoryTabs.razor]
+build_metadata.AdditionalFiles.TargetPath = RmVhdHVyZXMvQ3VzdG9tZXJNZW51L0NvbXBvbmVudHMvQ2F0ZWdvcnlUYWJzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/Features/CustomerMenu/Components/ItemDetailsModal.razor]
+build_metadata.AdditionalFiles.TargetPath = RmVhdHVyZXMvQ3VzdG9tZXJNZW51L0NvbXBvbmVudHMvSXRlbURldGFpbHNNb2RhbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/Features/CustomerMenu/Components/MenuItemCard.razor]
+build_metadata.AdditionalFiles.TargetPath = RmVhdHVyZXMvQ3VzdG9tZXJNZW51L0NvbXBvbmVudHMvTWVudUl0ZW1DYXJkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/Features/CustomerMenu/CustomerMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = RmVhdHVyZXMvQ3VzdG9tZXJNZW51L0N1c3RvbWVyTWVudS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/Features/Queue/Components/OrderKanbanCard.razor]
+build_metadata.AdditionalFiles.TargetPath = RmVhdHVyZXMvUXVldWUvQ29tcG9uZW50cy9PcmRlckthbmJhbkNhcmQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/Features/Queue/Components/QueueColumn.razor]
+build_metadata.AdditionalFiles.TargetPath = RmVhdHVyZXMvUXVldWUvQ29tcG9uZW50cy9RdWV1ZUNvbHVtbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/Features/Queue/Components/QueueStatusBadge.razor]
+build_metadata.AdditionalFiles.TargetPath = RmVhdHVyZXMvUXVldWUvQ29tcG9uZW50cy9RdWV1ZVN0YXR1c0JhZGdlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/Features/Queue/QueueDisplay.razor]
+build_metadata.AdditionalFiles.TargetPath = RmVhdHVyZXMvUXVldWUvUXVldWVEaXNwbGF5LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/Features/Queue/QueueManagement.razor]
+build_metadata.AdditionalFiles.TargetPath = RmVhdHVyZXMvUXVldWUvUXVldWVNYW5hZ2VtZW50LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/Pages/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/Shared/Layouts/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL0xheW91dHMvTWFpbkxheW91dC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/Shared/UI/ScandishBadge.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL1VJL1NjYW5kaXNoQmFkZ2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/Shared/UI/ScandishButton.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL1VJL1NjYW5kaXNoQnV0dG9uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/Shared/UI/ScandishCard.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL1VJL1NjYW5kaXNoQ2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/Shared/UI/ScandishInput.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL1VJL1NjYW5kaXNoSW5wdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/Shared/UI/ScandishModal.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL1VJL1NjYW5kaXNoTW9kYWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/Pages/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvRXJyb3IuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/Pages/_Host.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvX0hvc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/syedaaimanali/Documents/Aiman/cafeManager/CafeManager/Pages/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvX0xheW91dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
