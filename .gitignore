@@ -12,7 +12,10 @@ __v0_jsx-dev-runtime.ts
 # Common ignores
 node_modules
 .next/
-.DS_Storetailwindcss-linux-x64
+.DS_Store
 tailwindcss-linux-x64
 bin/
 obj/
+*.db
+*.db-shm
+*.db-wal
