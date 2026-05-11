@@ -2,7 +2,7 @@
 
 Scandish is a modern, responsive cafe management application designed for seamless customer ordering and efficient kitchen operations.
 
-## 🛠 Technical Stack
+##  Technical Stack
 - **Framework**: Blazor Server (ASP.NET Core 8)
 - **Styling**: Tailwind CSS with custom "Cafe Espresso" design system
 - **Database**: Entity Framework Core (PostgreSQL for production, SQLite for local fallback)
@@ -10,14 +10,14 @@ Scandish is a modern, responsive cafe management application designed for seamle
 - **Storage**: Local browser storage for cart persistence and order history
 - **Image Handling**: Base64 encoding for embedded menu item images
 
-## 🚀 Key Features
+##  Key Features
 - **Smart Menu**: Categorized menu with popular item highlights and tag-based search.
 - **Dynamic Ordering**: Supports item variants (sizes) and customizable add-ons.
 - **Live Order Tracking**: Real-time status bar for customers (Pending → Cooking → Ready).
 - **Kitchen Kanban**: Efficient order management for staff with auditory notifications.
 - **Admin Tools**: Comprehensive dashboard for menu, category, and outlet management.
 
-## 🏗 Implementation Step-by-Step
+##  Implementation Step-by-Step
 
 ### 1. Foundation & Database
 - Initialized the ASP.NET Core Blazor Server project.
@@ -43,7 +43,7 @@ Scandish is a modern, responsive cafe management application designed for seamle
 - Optimized performance using `AsNoTracking` for read-only queries and Eager Loading (`Include`) for complex data relations.
 - Fixed UI constraints like modal scrollability and responsive layout breaks to ensure production readiness.
 
-## 💡 Developer Insights & Architecture Details
+##  Developer Insights & Architecture Details
 
 As a developer (especially if you're coming from a Python background like **Flask/Django** or **FastAPI**), here are some specific implementation details that make this project tick:
 
@@ -68,7 +68,7 @@ As a developer (especially if you're coming from a Python background like **Flas
 ### 5. Simple Image Storage
 - For this project, we avoid the complexity of an S3 bucket. Images are resized on the client-side using a `Canvas` API, converted to **Base64 strings**, and stored directly in the database. This makes the project entirely self-contained and easy to move between environments.
 
-## 🏃 How to Run
+##  How to Run
 1. **Prerequisites**: .NET 8 SDK installed.
 2. **Launch**: Run `dotnet run --project CafeManager.csproj`
 3. **Explore**: 
