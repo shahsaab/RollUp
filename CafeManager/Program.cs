@@ -25,18 +25,32 @@ builder.Services.AddServerSideBlazor(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// ── EF Core + Database ──────────────────────────────────────────────────────
+// ── EF Core + Database (Dynamic Pre-Check Strategy) ─────────────────────────
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+bool usePostgres = false;
+
+try
+{
+    // Quick ping to check if PostgreSQL is alive
+    using var tempConn = new Npgsql.NpgsqlConnection(connectionString);
+    tempConn.Open();
+    usePostgres = true;
+}
+catch
+{
+    Console.WriteLine("⚠️ PostgreSQL not reachable. Submitting with SQLite Fallback for stability.");
+}
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    if (builder.Configuration.GetValue<bool>("UseSqlite"))
+    if (usePostgres)
     {
-        options.UseSqlite(builder.Configuration.GetConnectionString("SqliteConnection"));
+        options.UseNpgsql(connectionString, npgsqlOptions => 
+            npgsqlOptions.EnableRetryOnFailure(3));
     }
     else
     {
-        options.UseNpgsql(
-            builder.Configuration.GetConnectionString("DefaultConnection"),
-            npgsqlOptions => npgsqlOptions.EnableRetryOnFailure(3));
+        options.UseSqlite("Data Source=scandish_submission.db");
     }
 });
 
@@ -135,55 +149,55 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     
-    // Ensure DB is created (especially for SQLite fallback)
-    context.Database.EnsureCreated();
-    
-    // Seed Vendor & Outlet (Required for Menu Items)
-    if (!context.Vendors.Any())
+    try
     {
-        var vendor = new Vendor { Name = "Scandish Cafe Corp", ContactEmail = "contact@scandish.com" };
-        context.Vendors.Add(vendor);
-        context.SaveChanges();
-
-        var outlet = new Outlet 
-        { 
-            Name = "Main Branch", 
-            VendorId = vendor.Id,
-            IsActive = true 
-        };
-        context.Outlets.Add(outlet);
-        context.SaveChanges();
-    }
-
-    // Seed Categories
-    if (!context.Categories.Any())
-    {
-        var categories = new List<Category>
+        context.Database.EnsureCreated();
+        
+        // Seed Vendor & Outlet
+        if (!context.Vendors.Any())
         {
-            new Category { Name = "Hot Drinks", SortOrder = 1 },
-            new Category { Name = "Cold Drinks", SortOrder = 2 },
-            new Category { Name = "Pastries", SortOrder = 3 },
-            new Category { Name = "Sandwiches", SortOrder = 4 },
-            new Category { Name = "Desserts", SortOrder = 5 }
-        };
-        context.Categories.AddRange(categories);
-        context.SaveChanges();
-    }
+            var vendor = new Vendor { Name = "Scandish Cafe Corp", ContactEmail = "contact@scandish.com" };
+            context.Vendors.Add(vendor);
+            context.SaveChanges();
 
-    // Seed Admin User
-    if (!context.Users.Any())
-    {
-        var admin = new User
+            var outlet = new Outlet { Name = "Main Branch", VendorId = vendor.Id, IsActive = true };
+            context.Outlets.Add(outlet);
+            context.SaveChanges();
+        }
+
+        // Seed Categories
+        if (!context.Categories.Any())
         {
-            FullName = "System Admin",
-            Email = "admin@scandish.com",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
-            Role = CafeManager.Core.Enums.Role.Admin,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
-        context.Users.Add(admin);
-        context.SaveChanges();
+            var categories = new List<Category>
+            {
+                new Category { Name = "Hot Drinks", SortOrder = 1 },
+                new Category { Name = "Cold Drinks", SortOrder = 2 },
+                new Category { Name = "Pastries", SortOrder = 3 },
+                new Category { Name = "Sandwiches", SortOrder = 4 },
+                new Category { Name = "Desserts", SortOrder = 5 }
+            };
+            context.Categories.AddRange(categories);
+            context.SaveChanges();
+        }
+
+        // Seed Admin User
+        if (!context.Users.Any())
+        {
+            var admin = new User
+            {
+                FullName = "System Admin",
+                Email = "admin@scandish.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
+                Role = CafeManager.Core.Enums.Role.Admin,
+                CreatedAt = DateTime.UtcNow
+            };
+            context.Users.Add(admin);
+            context.SaveChanges();
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"FATAL: Database initialization failed: {ex.Message}");
     }
 }
 

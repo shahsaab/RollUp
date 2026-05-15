@@ -15,7 +15,7 @@ Scandish is a full-stack cafe management platform that streamlines the entire cu
 -  **Responsive Design** with Tailwind CSS custom design system
 -  **Modern UI Components** with "Cafe Espresso" aesthetic
 -  **Smart Notifications** with audio alerts for incoming orders
--  **Persistent Storage** using Entity Framework Core + PostgreSQL/SQLite
+-  **Persistent Storage** using Entity Framework Core + PostgreSQL
 
 ##  Features
 
@@ -45,7 +45,7 @@ Scandish is a full-stack cafe management platform that streamlines the entire cu
 | **Frontend Framework** | Blazor Server (ASP.NET Core 8) |
 | **Real-time** | SignalR WebSockets |
 | **Styling** | Tailwind CSS v3.4 |
-| **Database** | PostgreSQL (Production), SQLite (Development) |
+| **Database** | PostgreSQL |
 | **ORM** | Entity Framework Core 8 |
 | **Architecture** | Clean Architecture with Repository Pattern |
 
@@ -118,7 +118,7 @@ Scandish follows **Clean Architecture** principles with clear separation of conc
 ### Prerequisites
 - **.NET 8 SDK** ([Download](https://dotnet.microsoft.com/download/dotnet/8.0))
 - **Node.js** (for npm dependencies)
-- **PostgreSQL** (optional, SQLite works for development)
+- **PostgreSQL** (Required for database operations)
 
 ### Installation
 
@@ -268,7 +268,7 @@ Please ensure:
 - Verify SignalR hub endpoints are correctly mapped in `Program.cs`
 
 ### Database Connection Errors
-- Verify PostgreSQL is running (or configure SQLite fallback)
+- Verify PostgreSQL is running and accessible
 - Check connection string in `appsettings.json`
 - Run `dotnet ef database update` to apply migrations
 

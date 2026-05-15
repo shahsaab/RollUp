@@ -5,7 +5,7 @@ Scandish is a modern, responsive cafe management application designed for seamle
 ##  Technical Stack
 - **Framework**: Blazor Server (ASP.NET Core 8)
 - **Styling**: Tailwind CSS with custom "Cafe Espresso" design system
-- **Database**: Entity Framework Core (PostgreSQL for production, SQLite for local fallback)
+- **Database**: Entity Framework Core with **PostgreSQL** (with Automatic SQLite Fallback for stability)
 - **Real-time**: SignalR for instant order updates and kitchen notifications
 - **Storage**: Local browser storage for cart persistence and order history
 - **Image Handling**: Base64 encoding for embedded menu item images
@@ -21,7 +21,7 @@ Scandish is a modern, responsive cafe management application designed for seamle
 
 ### 1. Foundation & Database
 - Initialized the ASP.NET Core Blazor Server project.
-- Configured a dual-database strategy using **PostgreSQL** with a seamless fallback to **SQLite** for development flexibility.
+- Configured **PostgreSQL** as the unified database engine for both development and production.
 - Defined core entities: `MenuItem`, `Category`, `Order`, `OrderItem`, and `Addon`.
 
 ### 2. Modern Design System
@@ -47,12 +47,12 @@ Scandish is a modern, responsive cafe management application designed for seamle
 
 As a developer (especially if you're coming from a Python background like **Flask/Django** or **FastAPI**), here are some specific implementation details that make this project tick:
 
-### 1. The Real-time Engine (SignalR)
-- **What it is**: Think of this as a managed WebSockets wrapper. 
-- **Implementation**: We use `IOrderNotificationService` to broadcast events. When an order status changes in the database, a SignalR message is pushed to all connected clients.
-- **Python Comparison**: Similar to using **Channels** in Django or **WebSockets** with FastAPI.
+### 1. The Dynamic Database Pre-Check
+- **The Challenge**: Production apps often fail to start if the external database (PostgreSQL) is slightly slow or misconfigured.
+- **The Solution**: We implemented a **Pre-Check Strategy** in `Program.cs`. The app pings the PostgreSQL server at startup. If unreachable, it automatically swaps the service provider to **SQLite**.
+- **Developer Tip**: This makes the project "Zero-Config" for reviewers. They can run it immediately without setting up a database server, but it will still prefer the high-performance PostgreSQL if available.
 
-### 2. Audio & JS Interop
+### 2. The Real-time Engine (SignalR)
 - **The Sound**: We use a clean "Notification" sound for the kitchen. 
 - **How it works**: Since Blazor runs on the server, it can't directly play sounds in the user's browser. We use **JSInterop** (`IJSRuntime`) to call a small JavaScript function in `wwwroot/js/audio.js` which triggers the `Audio` object.
 - **Developer Tip**: Browsers block auto-playing audio unless the user has interacted with the page first. We handle this by ensuring the first user click enables the audio context.
@@ -66,7 +66,7 @@ As a developer (especially if you're coming from a Python background like **Flas
 - **Fix**: We wrapped event handlers in robust Try-Catch blocks and used `InvokeAsync(StateHasChanged)` to ensure the UI updates safely from background threads.
 
 ### 5. Simple Image Storage
-- For this project, we avoid the complexity of an S3 bucket. Images are resized on the client-side using a `Canvas` API, converted to **Base64 strings**, and stored directly in the database. This makes the project entirely self-contained and easy to move between environments.
+- For this project, we avoid the complexity of an S3 bucket. Images are resized on the client-side using a `Canvas` API, converted to **Base64 strings**, and stored directly in the database. This keeps the deployment simple and centralized in PostgreSQL.
 
 ##  How to Run
 1. **Prerequisites**: .NET 8 SDK installed.
