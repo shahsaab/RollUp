@@ -25,32 +25,24 @@ builder.Services.AddServerSideBlazor(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// ── EF Core + Database (Dynamic Pre-Check Strategy) ─────────────────────────
+// ── EF Core + Database Configuration ──────────────────────────────────────────
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-bool usePostgres = false;
-
-try
-{
-    // Quick ping to check if PostgreSQL is alive
-    using var tempConn = new Npgsql.NpgsqlConnection(connectionString);
-    tempConn.Open();
-    usePostgres = true;
-}
-catch
-{
-    Console.WriteLine("⚠️ PostgreSQL not reachable. Submitting with SQLite Fallback for stability.");
-}
+var dbOption = builder.Configuration["DBOption"]?.Trim();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    if (usePostgres)
+    if (string.Equals(dbOption, "Postgres", StringComparison.OrdinalIgnoreCase))
     {
+        Console.WriteLine("🗄️ Using PostgreSQL Database Provider.");
         options.UseNpgsql(connectionString, npgsqlOptions => 
             npgsqlOptions.EnableRetryOnFailure(3));
     }
     else
     {
-        options.UseSqlite("Data Source=scandish_submission.db");
+        // Default to MSSQL (if DBOption is "MSSQL", missing, or unrecognized)
+        Console.WriteLine("🗄️ Using Microsoft SQL Server Database Provider.");
+        options.UseSqlServer(connectionString, sqlOptions => 
+            sqlOptions.EnableRetryOnFailure(3));
     }
 });
 
