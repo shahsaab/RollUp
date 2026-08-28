@@ -1,0 +1,23 @@
+services:
+  rollup-app:
+    image: rollup-app:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rollup-app
+    restart: unless-stopped
+    ports:
+      - "5088:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - DBOption=Postgres
+      # Update with your PostgreSQL server connection details
+      - ConnectionStrings__DefaultConnection=Host=127.0.0.1;Port=5432;Database=rollup;Username=postgres;Password=YOUR_POSTGRES_PASSWORD
+      - Jwt__Secret=YourSuperSecretKeyWithAtLeast32CharactersLongForSecurity!
+      - Jwt__Issuer=RollUpPlatform
+      - Jwt__Audience=RollUpUsers
+    extra_hosts:
+      # Allows container to reach PostgreSQL on host machine if using Podman/Docker host network
+      - "host.containers.internal:host-gateway"
+      - "host.docker.internal:host-gateway"

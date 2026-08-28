@@ -1,5 +1,9 @@
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using RollUp.Application.DTOs;
+using RollUp.Core.Entities;
 using RollUp.Core.Interfaces;
 using RollUp.Infrastructure.Persistence;
 
@@ -18,9 +22,25 @@ public class BrandingService : IBrandingService
 
     public async Task<TenantBrandingDto> GetBrandingAsync()
     {
-        var tenantId = _tenantContext.CurrentTenantId ?? 1;
-        var tenant = await _db.Tenants.IgnoreQueryFilters().FirstOrDefaultAsync(t => t.Id == tenantId)
-                     ?? await _db.Tenants.IgnoreQueryFilters().FirstOrDefaultAsync();
+        var tenantId = _tenantContext.CurrentTenantId;
+        Tenant? tenant = null;
+
+        if (tenantId.HasValue && tenantId.Value > 0)
+        {
+            tenant = await _db.Tenants.IgnoreQueryFilters().FirstOrDefaultAsync(t => t.Id == tenantId.Value);
+        }
+        else if (!string.IsNullOrWhiteSpace(_tenantContext.CurrentTenantSlug))
+        {
+            tenant = await _db.Tenants.IgnoreQueryFilters().FirstOrDefaultAsync(t => t.Slug == _tenantContext.CurrentTenantSlug);
+        }
+
+        if (tenant == null)
+        {
+            // Pick most recently updated or active tenant
+            tenant = await _db.Tenants.IgnoreQueryFilters()
+                .OrderByDescending(t => t.UpdatedAt ?? t.CreatedAt)
+                .FirstOrDefaultAsync();
+        }
 
         if (tenant == null)
         {
@@ -43,7 +63,7 @@ public class BrandingService : IBrandingService
             Address = tenant.Address,
             ContactPhone = tenant.ContactPhone,
             ContactEmail = tenant.ContactEmail,
-            Currency = tenant.Currency ?? "USD",
+            Currency = string.IsNullOrWhiteSpace(tenant.Currency) ? "USD" : tenant.Currency,
             ThemeTemplate = string.IsNullOrWhiteSpace(tenant.ThemeTemplate) ? "bistro" : tenant.ThemeTemplate,
             ColorScheme = string.IsNullOrWhiteSpace(tenant.ColorScheme) ? "espresso" : tenant.ColorScheme,
             FontFamily = string.IsNullOrWhiteSpace(tenant.FontFamily) ? "inter" : tenant.FontFamily,
@@ -54,9 +74,20 @@ public class BrandingService : IBrandingService
 
     public async Task<bool> UpdateBrandingAsync(TenantBrandingDto dto)
     {
-        var tenantId = _tenantContext.CurrentTenantId ?? 1;
-        var tenant = await _db.Tenants.IgnoreQueryFilters().FirstOrDefaultAsync(t => t.Id == tenantId)
-                     ?? await _db.Tenants.IgnoreQueryFilters().FirstOrDefaultAsync();
+        var tenantId = _tenantContext.CurrentTenantId;
+        Tenant? tenant = null;
+
+        if (tenantId.HasValue && tenantId.Value > 0)
+        {
+            tenant = await _db.Tenants.IgnoreQueryFilters().FirstOrDefaultAsync(t => t.Id == tenantId.Value);
+        }
+
+        if (tenant == null)
+        {
+            tenant = await _db.Tenants.IgnoreQueryFilters()
+                .OrderByDescending(t => t.UpdatedAt ?? t.CreatedAt)
+                .FirstOrDefaultAsync();
+        }
 
         if (tenant == null) return false;
 

@@ -38,15 +38,15 @@
     <main class="max-w-5xl mx-auto px-4 py-8 print:p-0 print:m-0 print:max-w-none">
         
         <!-- Physical Booklet Sheet Preview -->
-        <div class="bg-white rounded-3xl shadow-xl p-8 md:p-12 print:shadow-none print:p-8 print:rounded-none print:border-none border border-stone-200 min-h-[1000px]"
+        <div class="rounded-3xl shadow-xl p-8 md:p-12 print:shadow-none print:p-8 print:rounded-none print:border-none border min-h-[1000px] transition-all @GetSheetClass()"
              style="font-family: @GetMenuFontFamily();">
             
             <!-- Booklet Header / Crest -->
             <div class="text-center pb-8 mb-8 border-b-2 @GetDividerBorderClass() relative">
                 <!-- Decorative Top Ornaments -->
-                <div class="text-stone-300 text-sm tracking-widest mb-2 font-mono">✦ ✦ ✦</div>
+                <div class="text-stone-400 text-sm tracking-widest mb-2 font-mono">✦ ✦ ✦</div>
 
-                <div class="w-12 h-12 mx-auto rounded-full bg-stone-900 text-white flex items-center justify-center text-xl mb-3 shadow-sm">
+                <div class="w-12 h-12 mx-auto rounded-full text-white flex items-center justify-center text-xl mb-3 shadow-sm @GetCrestBgClass()">
                     ☕
                 </div>
 
@@ -213,5 +213,23 @@
         "midnight" => "border-slate-700/50",
         "terracotta" => "border-orange-700/50",
         _ => "border-amber-800/40"
+    };
+
+    private string GetSheetClass() => branding.ThemeTemplate switch
+    {
+        "emerald" => "bg-[#FAFDFB] border-emerald-900/30 shadow-emerald-950/10",
+        "dark-velvet" => "bg-[#FDFBFC] border-purple-950/30 shadow-purple-950/10",
+        "artisan" => "bg-[#FDFBF7] border-amber-900/30 shadow-amber-950/10",
+        "amber" => "bg-[#FFFDF7] border-amber-800/30 shadow-amber-950/10",
+        "minimal" => "bg-white border-stone-300 shadow-stone-900/5",
+        _ => "bg-white border-stone-200"
+    };
+
+    private string GetCrestBgClass() => branding.ThemeTemplate switch
+    {
+        "emerald" => "bg-emerald-900",
+        "dark-velvet" => "bg-slate-900",
+        "amber" => "bg-amber-900",
+        _ => "bg-stone-900"
     };
 }
