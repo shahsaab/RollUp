@@ -1,4 +1,4 @@
-# ☕ Scandish - Cafe Management System
+﻿# ☕ RollUp - Cafe Management System
 
 A modern, responsive cafe management application built with **Blazor Server** and **ASP.NET Core 8**. Designed for seamless customer ordering and efficient kitchen operations with real-time updates.
 
@@ -8,7 +8,7 @@ A modern, responsive cafe management application built with **Blazor Server** an
 
 ##  Overview
 
-Scandish is a full-stack cafe management platform that streamlines the entire customer experience—from browsing a dynamic menu to real-time order tracking—while providing kitchen staff with an efficient Kanban-style dashboard for order management.
+RollUp is a full-stack cafe management platform that streamlines the entire customer experience—from browsing a dynamic menu to real-time order tracking—while providing kitchen staff with an efficient Kanban-style dashboard for order management.
 
 ### Key Highlights
 -  **Real-time Updates** using SignalR for instant order tracking
@@ -52,7 +52,7 @@ Scandish is a full-stack cafe management platform that streamlines the entire cu
 ##  Project Structure
 
 ```
-CafeManager/
+RollUp/
 ├── API/                          # REST API endpoints
 │   ├── Controllers/              # MenuController, OrdersController, etc.
 │   ├── Hubs/                     # SignalR hubs for real-time updates
@@ -81,7 +81,7 @@ CafeManager/
 │
 ├── Shared/                       # Shared components
 │   ├── Layouts/                  # MainLayout component
-│   └── UI/                       # Reusable UI components (ScandishButton, etc.)
+│   └── UI/                       # Reusable UI components (RollUpButton, etc.)
 │
 ├── Pages/                        # Razor pages (_Host.cshtml, Error pages)
 ├── Styles/                       # Global CSS
@@ -92,7 +92,7 @@ CafeManager/
 
 ##  Architecture
 
-Scandish follows **Clean Architecture** principles with clear separation of concerns:
+RollUp follows **Clean Architecture** principles with clear separation of concerns:
 
 ```
 ┌─────────────────────────────────┐
@@ -124,24 +124,24 @@ Scandish follows **Clean Architecture** principles with clear separation of conc
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/SyedaAimanAli/cafeManager.git
-   cd cafeManager
+   git clone https://github.com/SyedaAimanAli/RollUp.git
+   cd RollUp
    ```
 
 2. **Install dependencies**
    ```bash
-   cd CafeManager
+   cd RollUp
    npm install
    dotnet restore
    ```
 
 3. **Configure database connection**
    
-   Edit `CafeManager/appsettings.json`:
+   Edit `RollUp/appsettings.json`:
    ```json
    {
      "ConnectionStrings": {
-       "DefaultConnection": "Host=localhost;Database=cafemanager;User Id=postgres;Password=yourpassword;"
+       "DefaultConnection": "Host=localhost;Database=rollup;User Id=postgres;Password=yourpassword;"
      }
    }
    ```
@@ -153,7 +153,7 @@ Scandish follows **Clean Architecture** principles with clear separation of conc
 
 5. **Run the application**
    ```bash
-   dotnet run --project CafeManager.csproj
+   dotnet run --project RollUp.csproj
    ```
 
 6. **Access the application**
@@ -201,15 +201,15 @@ GET    /api/queue/stats        - Get queue statistics
 SignalR manages WebSocket connections for instant updates across all connected clients. When an order status changes, notifications are broadcast to customers and kitchen staff simultaneously.
 
 **Key Files:**
-- [OrderHub.cs](CafeManager/API/Hubs/OrderHub.cs) - Order update hub
-- [QueueHub.cs](CafeManager/API/Hubs/QueueHub.cs) - Queue status hub
+- [OrderHub.cs](RollUp/API/Hubs/OrderHub.cs) - Order update hub
+- [QueueHub.cs](RollUp/API/Hubs/QueueHub.cs) - Queue status hub
 
 ### Audio Notifications
 Audio alerts use JavaScript interop to trigger browser notifications. The system waits for user interaction to enable audio due to browser autoplay restrictions.
 
 **Files:**
-- [audio.js](CafeManager/wwwroot/js/audio.js) - Audio playback handler
-- [OrderNotificationService.cs](CafeManager/Core/Services/OrderNotificationService.cs)
+- [audio.js](RollUp/wwwroot/js/audio.js) - Audio playback handler
+- [OrderNotificationService.cs](RollUp/Core/Services/OrderNotificationService.cs)
 
 ### Image Storage
 Menu item images are stored as Base64 strings in the database, eliminating the need for external storage services while keeping the system self-contained.
@@ -256,7 +256,7 @@ Please ensure:
 
 ##  Documentation
 
-- [Project Summary](CafeManager/ProjectSummary.md) - Detailed technical breakdown
+- [Project Summary](RollUp/ProjectSummary.md) - Detailed technical breakdown
 - [Architecture Decisions](docs/ARCHITECTURE.md) - Design rationale (coming soon)
 - [API Documentation](docs/API.md) - Comprehensive endpoint reference (coming soon)
 
