@@ -1,4 +1,4 @@
-﻿namespace RollUp.Core.Entities;
+namespace RollUp.Core.Entities;
 
 public class Tenant : BaseEntity
 {
@@ -13,6 +13,13 @@ public class Tenant : BaseEntity
     public string Address { get; set; } = string.Empty;
     public string? Tagline { get; set; }
     public bool IsActive { get; set; } = true;
+
+    // Menu Design & Branding
+    public string ThemeTemplate { get; set; } = "bistro";
+    public string ColorScheme { get; set; } = "espresso";
+    public string FontFamily { get; set; } = "inter";
+    public string? CustomPrimaryColor { get; set; }
+    public string? CustomAccentColor { get; set; }
 
     // Navigation
     public ICollection<Outlet> Outlets { get; set; } = new List<Outlet>();

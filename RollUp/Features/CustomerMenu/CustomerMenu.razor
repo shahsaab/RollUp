@@ -1,38 +1,46 @@
-﻿@page "/menu"
+@page "/menu"
 @page "/menu/{TableNumber}"
 @using RollUp.Core.Interfaces
 @using RollUp.Core.Models
 @using RollUp.Features.CustomerMenu.Components
 @using RollUp.Shared
+@using RollUp.Application.DTOs
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @inject IMenuService MenuService
 @inject IOrderService OrderService
+@inject IBrandingService BrandingService
 @inject IOrderNotificationService NotificationService
 @inject ProtectedLocalStorage LocalStorage
 @inject IJSRuntime JSRuntime
 @implements IDisposable
 
-<PageTitle>Menu - RollUp</PageTitle>
+<PageTitle>@(string.IsNullOrWhiteSpace(branding.BusinessName) ? "Menu - RollUp" : $"{branding.BusinessName} - Menu")</PageTitle>
 
-<div class="min-h-screen bg-gradient-to-b from-cafe-cream to-white">
+<div class="min-h-screen @GetPageBgClass()" style="font-family: @GetMenuFontFamily();">
     <!-- Header -->
-    <header class="sticky top-0 z-40 bg-cafe-cream/95 backdrop-blur-sm border-b border-cafe-latte/50">
+    <header class="sticky top-0 z-40 backdrop-blur-sm border-b @GetHeaderClass()">
         <div class="max-w-lg mx-auto px-4 py-4">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="font-display text-2xl font-semibold text-cafe-espresso">RollUp</h1>
+                    <h1 class="text-2xl font-bold @(IsDark ? "text-white" : "text-stone-900")">
+                        @(string.IsNullOrWhiteSpace(branding.BusinessName) ? "RollUp" : branding.BusinessName)
+                    </h1>
                     @if (!string.IsNullOrEmpty(TableNumber))
                     {
-                        <p class="text-sm text-cafe-mocha">Table @TableNumber</p>
+                        <p class="text-xs font-semibold @(IsDark ? "text-stone-300" : "text-stone-600")">Table @TableNumber</p>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(branding.Tagline))
+                    {
+                        <p class="text-xs @(IsDark ? "text-stone-400" : "text-stone-500")">@branding.Tagline</p>
                     }
                 </div>
-                <button @onclick="ToggleCart" class="relative p-3 bg-cafe-espresso text-white rounded-full shadow-lg hover:bg-cafe-mocha transition-colors">
+                <button @onclick="ToggleCart" class="relative p-3 rounded-full shadow-lg transition-all @GetCartButtonClass()">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
                     @if (Cart.Count > 0)
                     {
-                        <span class="absolute -top-1 -right-1 bg-cafe-caramel text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                        <span class="absolute -top-1 -right-1 bg-rose-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-xs">
                             @Cart.Count
                         </span>
                     }
@@ -43,34 +51,42 @@
 
     <CategoryTabs Categories="Categories"
                   SelectedCategory="@SelectedCategory"
-                  OnCategorySelected="SelectCategory" />
+                  OnCategorySelected="SelectCategory"
+                  ThemeTemplate="@branding.ThemeTemplate"
+                  ColorScheme="@branding.ColorScheme" />
 
     <!-- Menu Items -->
     <main class="max-w-lg mx-auto px-4 py-6">
         @if (FilteredItems.Any(i => i.IsPopular && i.IsAvailable) && SelectedCategory == Categories.FirstOrDefault())
         {
             <section class="mb-8">
-                <h2 class="font-display text-xl font-semibold text-cafe-espresso mb-4 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-cafe-caramel" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 @(IsDark ? "text-white" : "text-stone-900")">
+                    <span class="text-amber-500">★</span>
                     Popular Items
                 </h2>
-                <div class="space-y-4">
+                <div class="space-y-3">
                     @foreach (var item in FilteredItems.Where(i => i.IsPopular && i.IsAvailable))
                     {
-                        <MenuItemCard Item="item" OnAddToCart="OpenItemModal" />
+                        <MenuItemCard Item="item" 
+                                      OnAddToCart="OpenItemModal"
+                                      ThemeTemplate="@branding.ThemeTemplate"
+                                      ColorScheme="@branding.ColorScheme"
+                                      Currency="@branding.Currency" />
                     }
                 </div>
             </section>
         }
 
         <section>
-            <h2 class="font-display text-xl font-semibold text-cafe-espresso mb-4">@SelectedCategory</h2>
-            <div class="space-y-4">
+            <h2 class="text-lg font-bold mb-4 @(IsDark ? "text-white" : "text-stone-900")">@SelectedCategory</h2>
+            <div class="space-y-3">
                 @foreach (var item in FilteredItems.Where(i => !i.IsPopular || SelectedCategory != Categories.FirstOrDefault()))
                 {
-                    <MenuItemCard Item="item" OnAddToCart="OpenItemModal" />
+                    <MenuItemCard Item="item" 
+                                  OnAddToCart="OpenItemModal"
+                                  ThemeTemplate="@branding.ThemeTemplate"
+                                  ColorScheme="@branding.ColorScheme"
+                                  Currency="@branding.Currency" />
                 }
             </div>
         </section>
@@ -244,9 +260,11 @@
     private System.Threading.Timer? _refreshTimer;
 
     private decimal CartTotal => Cart.Sum(c => c.TotalPrice);
+    private TenantBrandingDto branding = new();
 
     protected override async Task OnInitializedAsync()
     {
+        branding = await BrandingService.GetBrandingAsync();
         Categories = await MenuService.GetCategoriesAsync();
         SelectedCategory = Categories.FirstOrDefault() ?? string.Empty;
         AllItems = await MenuService.GetAllItemsAsync();
@@ -473,6 +491,47 @@
         OrderStatus.Completed => "Order Done",
         OrderStatus.Cancelled => "Order Canceled",
         _ => status.ToString()
+    };
+
+    private bool IsDark => branding.ThemeTemplate == "dark-velvet" || branding.ThemeTemplate == "emerald";
+
+    private string GetPageBgClass() => branding.ThemeTemplate switch
+    {
+        "dark-velvet" => "bg-slate-950 text-stone-100",
+        "emerald" => "bg-[#0B1D16] text-stone-100",
+        "minimal" => "bg-stone-50 text-stone-900",
+        "amber" => "bg-gradient-to-b from-amber-50/80 to-white text-stone-900",
+        "artisan" => "bg-gradient-to-b from-[#FBF6EE] to-white text-stone-900",
+        _ => "bg-gradient-to-b from-[#FDF6E9] to-white text-stone-900"
+    };
+
+    private string GetHeaderClass() => branding.ThemeTemplate switch
+    {
+        "dark-velvet" => "bg-slate-950/95 border-white/10",
+        "emerald" => "bg-[#0B1D16]/95 border-white/10",
+        "minimal" => "bg-white/95 border-stone-200",
+        "amber" => "bg-amber-50/95 border-amber-200",
+        "artisan" => "bg-[#FBF6EE]/95 border-amber-900/10",
+        _ => "bg-[#FDF6E9]/95 border-amber-900/10"
+    };
+
+    private string GetCartButtonClass() => branding.ColorScheme switch
+    {
+        "matcha" => "bg-emerald-700 text-white hover:bg-emerald-800",
+        "royal-plum" => "bg-pink-700 text-white hover:bg-pink-800",
+        "midnight" => "bg-amber-500 text-slate-950 font-bold hover:bg-amber-400",
+        "terracotta" => "bg-orange-700 text-white hover:bg-orange-800",
+        _ => "bg-[#3D2314] text-white hover:bg-[#6B4423]"
+    };
+
+    private string GetMenuFontFamily() => branding.FontFamily switch
+    {
+        "playfair" => "'Playfair Display', Georgia, serif",
+        "poppins" => "'Poppins', sans-serif",
+        "cinzel" => "'Cinzel', Georgia, serif",
+        "cormorant" => "'Cormorant Garamond', Georgia, serif",
+        "montserrat" => "'Montserrat', sans-serif",
+        _ => "'Inter', sans-serif"
     };
 
     public void Dispose()

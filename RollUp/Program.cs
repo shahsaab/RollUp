@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using RollUp.API.Hubs;
 using RollUp.API.Middleware;
 using RollUp.Application.Services;
@@ -36,11 +36,12 @@ var dbOption = builder.Configuration["DBOption"]?.Trim();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    if (string.Equals(dbOption, "Postgres", StringComparison.OrdinalIgnoreCase))
+    if (string.Equals(dbOption, "SqlServer", StringComparison.OrdinalIgnoreCase) || 
+        string.Equals(dbOption, "MSSQL", StringComparison.OrdinalIgnoreCase))
     {
-        Console.WriteLine("🗄️ Using PostgreSQL Database Provider.");
-        options.UseNpgsql(connectionString, npgsqlOptions => 
-            npgsqlOptions.EnableRetryOnFailure(3));
+        Console.WriteLine("🗄️ Using Microsoft SQL Server Database Provider.");
+        options.UseSqlServer(connectionString, sqlOptions => 
+            sqlOptions.EnableRetryOnFailure(3));
     }
     else if (string.Equals(dbOption, "Sqlite", StringComparison.OrdinalIgnoreCase))
     {
@@ -49,10 +50,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     }
     else
     {
-        // Default to MSSQL
-        Console.WriteLine("🗄️ Using Microsoft SQL Server Database Provider.");
-        options.UseSqlServer(connectionString, sqlOptions => 
-            sqlOptions.EnableRetryOnFailure(3));
+        // Default to PostgreSQL
+        Console.WriteLine("🗄️ Using PostgreSQL Database Provider.");
+        options.UseNpgsql(connectionString, npgsqlOptions => 
+            npgsqlOptions.EnableRetryOnFailure(3));
     }
 });
 
@@ -109,6 +110,9 @@ builder.Services.AddScoped<JwtProvider>();
 
 // ── Application Services ──────────────────────────────────────────────────────
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IBrandingService, BrandingService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IVendorService, VendorService>();
 builder.Services.AddScoped<IQueueService, QueueService>();
 
@@ -158,14 +162,10 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     try
     {
-        if (context.Database.IsRelational())
-        {
-            context.Database.Migrate();
-        }
-        else
-        {
-            context.Database.EnsureCreated();
-        }
+        // During MVP development, EnsureCreated directly provisions the schema from the model,
+        // making the database layer completely portable across MSSQL, PostgreSQL, and SQLite.
+        // TODO (Post-MVP): Transition to Option A (clean, provider-agnostic EF Core migrations).
+        context.Database.EnsureCreated();
 
         // Seed Tenant
         var defaultTenant = context.Tenants.FirstOrDefault(t => t.Slug == "default");

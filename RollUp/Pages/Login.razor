@@ -126,7 +126,7 @@
                 // Redirect based on role
                 if (response.User.Role == Role.Admin.ToString() || response.User.Role == Role.Manager.ToString())
                 {
-                    Navigation.NavigateTo("/manage", forceLoad: true);
+                    Navigation.NavigateTo("/", forceLoad: true);
                 }
                 else if (response.User.Role == Role.Kitchen.ToString())
                 {
