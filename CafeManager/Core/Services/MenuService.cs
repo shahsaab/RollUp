@@ -10,13 +10,16 @@ public class MenuService : IMenuService
 {
     private readonly IRepository<CafeManager.Core.Entities.MenuItem> _itemRepository;
     private readonly IRepository<CafeManager.Core.Entities.Category> _categoryRepository;
+    private readonly IRepository<CafeManager.Core.Entities.Outlet> _outletRepository;
 
     public MenuService(
         IRepository<CafeManager.Core.Entities.MenuItem> itemRepository,
-        IRepository<CafeManager.Core.Entities.Category> categoryRepository)
+        IRepository<CafeManager.Core.Entities.Category> categoryRepository,
+        IRepository<CafeManager.Core.Entities.Outlet> outletRepository)
     {
         _itemRepository = itemRepository;
         _categoryRepository = categoryRepository;
+        _outletRepository = outletRepository;
     }
 
     public async Task<List<MenuItem>> GetAllItemsAsync()
@@ -63,6 +66,9 @@ public class MenuService : IMenuService
             await _categoryRepository.SaveChangesAsync();
         }
 
+        var outlets = await _outletRepository.GetAllAsync();
+        var defaultOutletId = outlets.FirstOrDefault()?.Id ?? 1;
+
         var entity = new CafeManager.Core.Entities.MenuItem
         {
             Name = model.Name,
@@ -73,7 +79,7 @@ public class MenuService : IMenuService
             IsPopular = model.IsPopular,
             Tags = string.Join(",", model.Tags),
             CategoryId = category.Id,
-            OutletId = 1 // Default outlet for now
+            OutletId = defaultOutletId
         };
 
         await _itemRepository.AddAsync(entity);

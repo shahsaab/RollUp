@@ -1,8 +1,9 @@
 using CafeManager.Core.Enums;
+using CafeManager.Core.Interfaces;
 
 namespace CafeManager.Core.Entities;
 
-public class Order : BaseEntity
+public class Order : BaseEntity, ITenantEntity
 {
     public string OrderNumber { get; set; } = string.Empty;
     public string CustomerName { get; set; } = string.Empty;
@@ -10,6 +11,10 @@ public class Order : BaseEntity
     public OrderStatus Status { get; set; } = OrderStatus.Pending;
     public OrderType Type { get; set; } = OrderType.DineIn;
     public DateTime? CompletedAt { get; set; }
+
+    // Multi-tenancy
+    public int TenantId { get; set; }
+    public Tenant Tenant { get; set; } = null!;
 
     // Navigation
     public int OutletId { get; set; }

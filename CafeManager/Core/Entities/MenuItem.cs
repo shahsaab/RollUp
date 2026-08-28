@@ -1,10 +1,11 @@
+using CafeManager.Core.Interfaces;
+
 namespace CafeManager.Core.Entities;
 
 /// <summary>
 /// EF Core-mapped MenuItem entity for persistence.
-/// The lightweight <see cref="CafeManager.Core.Models.MenuItem"/> model remains in use by mock services.
 /// </summary>
-public class MenuItem : BaseEntity
+public class MenuItem : BaseEntity, ITenantEntity
 {
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
@@ -15,6 +16,10 @@ public class MenuItem : BaseEntity
 
     // Stored as comma-separated; can be normalised later
     public string Tags { get; set; } = string.Empty;
+
+    // Multi-tenancy
+    public int TenantId { get; set; }
+    public Tenant Tenant { get; set; } = null!;
 
     // Navigation
     public int CategoryId { get; set; }

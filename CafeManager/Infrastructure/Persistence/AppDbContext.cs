@@ -1,13 +1,21 @@
 using CafeManager.Core.Entities;
+using CafeManager.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace CafeManager.Infrastructure.Persistence;
 
 public class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+    private readonly ITenantContext? _tenantContext;
+
+    public AppDbContext(DbContextOptions<AppDbContext> options, ITenantContext? tenantContext = null) 
+        : base(options)
+    {
+        _tenantContext = tenantContext;
+    }
 
     // ── DbSets ────────────────────────────────────────────────────────────────
+    public DbSet<Tenant> Tenants => Set<Tenant>();
     public DbSet<User> Users => Set<User>();
     public DbSet<Vendor> Vendors => Set<Vendor>();
     public DbSet<Outlet> Outlets => Set<Outlet>();
@@ -23,37 +31,87 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // ── Global soft-delete query filters ──────────────────────────────────
-        modelBuilder.Entity<User>().HasQueryFilter(e => !e.IsDeleted);
+        // Helper to get current tenant filter
+        // If _tenantContext is null or CurrentTenantId is null (e.g. background job / admin bypass), no tenant restriction is applied
+        var currentTenantId = _tenantContext?.CurrentTenantId;
+
+        // ── Global soft-delete & multi-tenant query filters ───────────────────
+        modelBuilder.Entity<Tenant>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<Vendor>().HasQueryFilter(e => !e.IsDeleted);
-        modelBuilder.Entity<Outlet>().HasQueryFilter(e => !e.IsDeleted);
-        modelBuilder.Entity<Category>().HasQueryFilter(e => !e.IsDeleted);
-        modelBuilder.Entity<Core.Entities.MenuItem>().HasQueryFilter(e => !e.IsDeleted);
-        modelBuilder.Entity<Order>().HasQueryFilter(e => !e.IsDeleted);
+        
+        modelBuilder.Entity<User>().HasQueryFilter(e => 
+            !e.IsDeleted && (_tenantContext == null || _tenantContext.CurrentTenantId == null || e.TenantId == _tenantContext.CurrentTenantId));
+        
+        modelBuilder.Entity<Outlet>().HasQueryFilter(e => 
+            !e.IsDeleted && (_tenantContext == null || _tenantContext.CurrentTenantId == null || e.TenantId == _tenantContext.CurrentTenantId));
+        
+        modelBuilder.Entity<Category>().HasQueryFilter(e => 
+            !e.IsDeleted && (_tenantContext == null || _tenantContext.CurrentTenantId == null || e.TenantId == _tenantContext.CurrentTenantId));
+        
+        modelBuilder.Entity<Core.Entities.MenuItem>().HasQueryFilter(e => 
+            !e.IsDeleted && (_tenantContext == null || _tenantContext.CurrentTenantId == null || e.TenantId == _tenantContext.CurrentTenantId));
+        
+        modelBuilder.Entity<Order>().HasQueryFilter(e => 
+            !e.IsDeleted && (_tenantContext == null || _tenantContext.CurrentTenantId == null || e.TenantId == _tenantContext.CurrentTenantId));
+        
         modelBuilder.Entity<OrderItem>().HasQueryFilter(e => !e.IsDeleted);
-        modelBuilder.Entity<QueueEntry>().HasQueryFilter(e => !e.IsDeleted);
+        
+        modelBuilder.Entity<QueueEntry>().HasQueryFilter(e => 
+            !e.IsDeleted && (_tenantContext == null || _tenantContext.CurrentTenantId == null || e.TenantId == _tenantContext.CurrentTenantId));
+        
         modelBuilder.Entity<Payment>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<SubscriptionPlan>().HasQueryFilter(e => !e.IsDeleted);
+
+        // ── Tenant ────────────────────────────────────────────────────────────
+        modelBuilder.Entity<Tenant>(e =>
+        {
+            e.HasIndex(t => t.Slug).IsUnique();
+        });
 
         // ── User ──────────────────────────────────────────────────────────────
         modelBuilder.Entity<User>(e =>
         {
             e.HasIndex(u => u.Email).IsUnique();
             e.Property(u => u.Role).HasConversion<string>();
+
+            e.HasOne(u => u.Tenant)
+             .WithMany(t => t.Users)
+             .HasForeignKey(u => u.TenantId)
+             .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // ── Vendor → Outlets (1:many) ─────────────────────────────────────────
+        // ── Tenant → Outlets (1:many) ─────────────────────────────────────────
         modelBuilder.Entity<Outlet>(e =>
         {
+            e.HasOne(o => o.Tenant)
+             .WithMany(t => t.Outlets)
+             .HasForeignKey(o => o.TenantId)
+             .OnDelete(DeleteBehavior.Cascade);
+
             e.HasOne(o => o.Vendor)
              .WithMany(v => v.Outlets)
              .HasForeignKey(o => o.VendorId)
+             .IsRequired(false)
              .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ── Tenant → Category (1:many) ────────────────────────────────────────
+        modelBuilder.Entity<Category>(e =>
+        {
+            e.HasOne(c => c.Tenant)
+             .WithMany(t => t.Categories)
+             .HasForeignKey(c => c.TenantId)
+             .OnDelete(DeleteBehavior.Cascade);
         });
 
         // ── Outlet → MenuItems (1:many) ───────────────────────────────────────
         modelBuilder.Entity<Core.Entities.MenuItem>(e =>
         {
+            e.HasOne(m => m.Tenant)
+             .WithMany(t => t.MenuItems)
+             .HasForeignKey(m => m.TenantId)
+             .OnDelete(DeleteBehavior.Cascade);
+
             e.HasOne(m => m.Outlet)
              .WithMany(o => o.MenuItems)
              .HasForeignKey(m => m.OutletId)
@@ -70,6 +128,11 @@ public class AppDbContext : DbContext
         // ── Order ─────────────────────────────────────────────────────────────
         modelBuilder.Entity<Order>(e =>
         {
+            e.HasOne(o => o.Tenant)
+             .WithMany(t => t.Orders)
+             .HasForeignKey(o => o.TenantId)
+             .OnDelete(DeleteBehavior.Cascade);
+
             e.HasOne(o => o.Outlet)
              .WithMany(out_ => out_.Orders)
              .HasForeignKey(o => o.OutletId)
@@ -129,15 +192,21 @@ public class AppDbContext : DbContext
         });
     }
 
-    /// <summary>Automatically set UpdatedAt on every SaveChanges call.</summary>
+    /// <summary>Automatically set Timestamps and TenantId on every SaveChanges call.</summary>
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
+        var currentTenantId = _tenantContext?.CurrentTenantId;
+
         foreach (var entry in ChangeTracker.Entries<Core.Entities.BaseEntity>())
         {
             switch (entry.State)
             {
                 case EntityState.Added:
                     entry.Entity.CreatedAt = DateTime.UtcNow;
+                    if (entry.Entity is ITenantEntity tenantEntity && tenantEntity.TenantId == 0 && currentTenantId.HasValue)
+                    {
+                        tenantEntity.TenantId = currentTenantId.Value;
+                    }
                     break;
                 case EntityState.Modified:
                     entry.Entity.UpdatedAt = DateTime.UtcNow;

@@ -1,6 +1,8 @@
+using CafeManager.Core.Interfaces;
+
 namespace CafeManager.Core.Entities;
 
-public class QueueEntry : BaseEntity
+public class QueueEntry : BaseEntity, ITenantEntity
 {
     public string CustomerName { get; set; } = string.Empty;
     public int PartySize { get; set; } = 1;
@@ -8,6 +10,10 @@ public class QueueEntry : BaseEntity
     public bool IsSeated { get; set; } = false;
     public DateTime? SeatedAt { get; set; }
     public int Position { get; set; }
+
+    // Multi-tenancy
+    public int TenantId { get; set; }
+    public Tenant Tenant { get; set; } = null!;
 
     // Navigation
     public int OutletId { get; set; }

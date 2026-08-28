@@ -16,26 +16,34 @@ public class JwtProvider
         _config = config;
     }
 
-    public (string token, DateTime expiresAt) Generate(User user)
+    public (string token, DateTime expiresAt) Generate(User user, Tenant? tenant = null)
     {
         var secret = _config["Jwt:Secret"]
             ?? throw new InvalidOperationException("Jwt:Secret is not configured.");
         var issuer   = _config["Jwt:Issuer"]   ?? "CafeManager";
         var audience = _config["Jwt:Audience"] ?? "CafeManager";
-        var expiryMinutes = int.TryParse(_config["Jwt:ExpiryMinutes"], out var m) ? m : 60;
+        var expiryMinutes = int.TryParse(_config["Jwt:ExpiryMinutes"], out var m) ? m : 480; // 8 hours default
 
         var key   = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var expiresAt = DateTime.UtcNow.AddMinutes(expiryMinutes);
 
-        var claims = new[]
+        var tenantId = user.TenantId != 0 ? user.TenantId : tenant?.Id ?? 0;
+        var tenantSlug = tenant?.Slug ?? user.Tenant?.Slug ?? "";
+        var tenantName = tenant?.Name ?? user.Tenant?.Name ?? "";
+
+        var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub,   user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim(ClaimTypes.Name,               user.FullName),
-            new Claim(ClaimTypes.Role,               user.Role.ToString()),
-            new Claim("outlet_id",                   user.OutletId?.ToString() ?? ""),
-            new Claim(JwtRegisteredClaimNames.Jti,   Guid.NewGuid().ToString()),
+            new(JwtRegisteredClaimNames.Sub,   user.Id.ToString()),
+            new(ClaimTypes.NameIdentifier,     user.Id.ToString()),
+            new(JwtRegisteredClaimNames.Email, user.Email),
+            new(ClaimTypes.Name,               user.FullName),
+            new(ClaimTypes.Role,               user.Role.ToString()),
+            new("tenant_id",                   tenantId.ToString()),
+            new("tenant_slug",                 tenantSlug),
+            new("tenant_name",                 tenantName),
+            new("outlet_id",                   user.OutletId?.ToString() ?? ""),
+            new(JwtRegisteredClaimNames.Jti,   Guid.NewGuid().ToString()),
         };
 
         var token = new JwtSecurityToken(

@@ -25,6 +25,26 @@ public class AuthController : ControllerBase
         return Ok(result);
     }
 
+    /// <summary>Onboard a new business/tenant with business info and admin user.</summary>
+    [HttpPost("onboard")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Onboard([FromBody] TenantOnboardingRequestDto request)
+    {
+        try
+        {
+            var result = await _auth.OnboardTenantAsync(request);
+            return Ok(result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
     /// <summary>Register a new staff user.</summary>
     [HttpPost("register")]
     [Authorize(Roles = "Admin,Manager")]

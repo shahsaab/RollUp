@@ -13,6 +13,7 @@ public class OrderService : IOrderService
     private readonly IRepository<CafeManager.Core.Entities.Order> _orderRepository;
     private readonly IRepository<CafeManager.Core.Entities.OrderItem> _orderItemRepository;
     private readonly IRepository<CafeManager.Core.Entities.MenuItem> _menuItemRepository;
+    private readonly IRepository<CafeManager.Core.Entities.Outlet> _outletRepository;
     private readonly IOrderNotificationService _notificationService;
 
     public event Action? OnOrdersChanged
@@ -25,11 +26,13 @@ public class OrderService : IOrderService
         IRepository<CafeManager.Core.Entities.Order> orderRepository,
         IRepository<CafeManager.Core.Entities.OrderItem> orderItemRepository,
         IRepository<CafeManager.Core.Entities.MenuItem> menuItemRepository,
+        IRepository<CafeManager.Core.Entities.Outlet> outletRepository,
         IOrderNotificationService notificationService)
     {
         _orderRepository = orderRepository;
         _orderItemRepository = orderItemRepository;
         _menuItemRepository = menuItemRepository;
+        _outletRepository = outletRepository;
         _notificationService = notificationService;
     }
 
@@ -92,6 +95,9 @@ public class OrderService : IOrderService
         // Or for now, just # + ticks to ensure uniqueness without double save
         var orderNumber = $"#{DateTime.UtcNow:yyMMdd}-{Guid.NewGuid().ToString("N").Substring(0, 4).ToUpper()}";
 
+        var outlets = await _outletRepository.GetAllAsync();
+        var defaultOutletId = outlets.FirstOrDefault()?.Id ?? 1;
+
         var orderEntity = new CafeManager.Core.Entities.Order
         {
             OrderNumber = orderNumber,
@@ -100,7 +106,7 @@ public class OrderService : IOrderService
             Type = type,
             Status = OrderStatus.Pending,
             CreatedAt = DateTime.UtcNow,
-            OutletId = 1
+            OutletId = defaultOutletId
         };
 
         // Add all items to the order entity first

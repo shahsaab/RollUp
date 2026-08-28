@@ -8,11 +8,16 @@ using CafeManager.Core.Services;
 using CafeManager.Infrastructure.Authentication;
 using CafeManager.Infrastructure.Persistence;
 using CafeManager.Infrastructure.Repositories;
+using CafeManager.Infrastructure.Tenancy;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// ── Multi-Tenancy Context ─────────────────────────────────────────────────────
+builder.Services.AddScoped<ITenantContext, TenantContext>();
 
 // ── Blazor Server ─────────────────────────────────────────────────────────────
 builder.Services.AddRazorPages();
@@ -37,9 +42,14 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseNpgsql(connectionString, npgsqlOptions => 
             npgsqlOptions.EnableRetryOnFailure(3));
     }
+    else if (string.Equals(dbOption, "Sqlite", StringComparison.OrdinalIgnoreCase))
+    {
+        Console.WriteLine("🗄️ Using SQLite Database Provider.");
+        options.UseSqlite(string.IsNullOrWhiteSpace(connectionString) ? "Data Source=cafemanager.db" : connectionString);
+    }
     else
     {
-        // Default to MSSQL (if DBOption is "MSSQL", missing, or unrecognized)
+        // Default to MSSQL
         Console.WriteLine("🗄️ Using Microsoft SQL Server Database Provider.");
         options.UseSqlServer(connectionString, sqlOptions => 
             sqlOptions.EnableRetryOnFailure(3));
@@ -49,7 +59,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // ── Generic Repository ────────────────────────────────────────────────────────
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
-// ── JWT Auth ──────────────────────────────────────────────────────────────────
+// ── JWT Auth & Blazor Auth State ──────────────────────────────────────────────
 var jwtSecret = builder.Configuration["Jwt:Secret"]
     ?? throw new InvalidOperationException("Jwt:Secret is not configured.");
 
@@ -84,6 +94,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
+builder.Services.AddAuthorizationCore();
+
+// ── Storage & Custom Auth State Provider ──────────────────────────────────────
+builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
+builder.Services.AddScoped<CustomAuthStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<CustomAuthStateProvider>());
 
 // ── SignalR ───────────────────────────────────────────────────────────────────
 builder.Services.AddSignalR();
@@ -96,92 +112,68 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IVendorService, VendorService>();
 builder.Services.AddScoped<IQueueService, QueueService>();
 
-// ── Mock Services (transitioning to DB-backed Scoped services) ───────────
-builder.Services.AddScoped<IMenuService, MenuService>();
-builder.Services.AddScoped<IOrderService, OrderService>();
-builder.Services.AddSingleton<IOrderNotificationService, OrderNotificationService>();
-
-// ═════════════════════════════════════════════════════════════════════════════
-var app = builder.Build();
-
-// ── Global Exception Handler ──────────────────────────────────────────────────
-// app.UseMiddleware<ExceptionMiddleware>();
-
-// ── HTTP Pipeline ─────────────────────────────────────────────────────────────
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error");
-    app.UseHsts();
-}
-
-if (!app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
-app.UseStaticFiles();
-app.UseRouting();
-
-// ── Auth ──────────────────────────────────────────────────────────────────────
-app.UseAuthentication();
-app.UseAuthorization();
-
-// ── REST API endpoints ────────────────────────────────────────────────────────
-app.MapControllers();
-
-// ── SignalR Hubs ──────────────────────────────────────────────────────────────
-app.MapHub<QueueHub>("/hubs/queue");
-app.MapHub<OrderHub>("/hubs/orders");
-
-// ── Blazor ────────────────────────────────────────────────────────────────────
-app.MapBlazorHub();
-app.MapFallbackToPage("/_Host");
-
-// ── Data Seeding ──────────────────────────────────────────────────────────────
+// ── Menu & Order Services ─────────────────────────────────────────�// ── Database Migration ────────────────────────────────────────────────────────
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    
     try
     {
-        context.Database.EnsureCreated();
-        
-        // Seed Vendor & Outlet
-        if (!context.Vendors.Any())
+        if (context.Database.IsRelational())
         {
-            var vendor = new Vendor { Name = "Scandish Cafe Corp", ContactEmail = "contact@scandish.com" };
+            context.Database.Migrate();
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"⚠️ Database migration check: {ex.Message}");
+    }
+}
+
+app.Run();ontactEmail = defaultTenant.ContactEmail };
             context.Vendors.Add(vendor);
             context.SaveChanges();
 
-            var outlet = new Outlet { Name = "Main Branch", VendorId = vendor.Id, IsActive = true };
-            context.Outlets.Add(outlet);
+            defaultOutlet = new Outlet 
+            { 
+                Name = "Downtown Branch", 
+                TenantId = defaultTenant.Id, 
+                VendorId = vendor.Id, 
+                IsActive = true,
+                Address = defaultTenant.Address,
+                Phone = defaultTenant.ContactPhone
+            };
+            context.Outlets.Add(defaultOutlet);
             context.SaveChanges();
         }
 
         // Seed Categories
-        if (!context.Categories.Any())
+        if (!context.Categories.IgnoreQueryFilters().Any())
         {
             var categories = new List<Category>
             {
-                new Category { Name = "Hot Drinks", SortOrder = 1 },
-                new Category { Name = "Cold Drinks", SortOrder = 2 },
-                new Category { Name = "Pastries", SortOrder = 3 },
-                new Category { Name = "Sandwiches", SortOrder = 4 },
-                new Category { Name = "Desserts", SortOrder = 5 }
+                new() { Name = "Hot Coffee", SortOrder = 1, TenantId = defaultTenant.Id },
+                new() { Name = "Cold Brews & Iced", SortOrder = 2, TenantId = defaultTenant.Id },
+                new() { Name = "Bakery & Pastries", SortOrder = 3, TenantId = defaultTenant.Id },
+                new() { Name = "Artisan Sandwiches", SortOrder = 4, TenantId = defaultTenant.Id },
+                new() { Name = "Desserts", SortOrder = 5, TenantId = defaultTenant.Id }
             };
             context.Categories.AddRange(categories);
             context.SaveChanges();
         }
 
         // Seed Admin User
-        if (!context.Users.Any())
+        if (!context.Users.IgnoreQueryFilters().Any())
         {
             var admin = new User
             {
-                FullName = "System Admin",
-                Email = "admin@scandish.com",
+                FullName     = "System Admin",
+                Email        = "admin@scandish.com",
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
-                Role = CafeManager.Core.Enums.Role.Admin,
-                CreatedAt = DateTime.UtcNow
+                Role         = CafeManager.Core.Enums.Role.Admin,
+                TenantId     = defaultTenant.Id,
+                OutletId     = defaultOutlet.Id,
+                CreatedAt    = DateTime.UtcNow,
+                IsActive     = true
             };
             context.Users.Add(admin);
             context.SaveChanges();
