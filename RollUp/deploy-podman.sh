@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # RollUp Deployment Script for RHEL / Podman
-# Domain: rollup.eraconnect.net
+# Domain: rollup-app.eraconnect.net
 # Exposed Port: 5088
 # ==============================================================================
 
@@ -12,12 +12,12 @@ IMAGE_TAG="rollup-app:latest"
 HOST_PORT="5088"
 CONTAINER_PORT="8080"
 
-# Change these to your production PostgreSQL credentials if hosted on host
+# Change these to your production MSSQL credentials if hosted on the host/network
 DB_HOST="${DB_HOST:-127.0.0.1}"
-DB_PORT="${DB_PORT:-5432}"
+DB_PORT="${DB_PORT:-1433}"
 DB_NAME="${DB_NAME:-rollup}"
-DB_USER="${DB_USER:-postgres}"
-DB_PASS="${DB_PASS:-postgres}"
+DB_USER="${DB_USER:-sa}"
+DB_PASS="${DB_PASS:-YourStrong@Passw0rd}"
 
 echo "=========================================="
 echo "🚀 Building & Deploying RollUp with Podman"
@@ -41,8 +41,8 @@ podman run -d \
   --network=slirp4netns:allow_host_loopback=true \
   -e ASPNETCORE_ENVIRONMENT=Production \
   -e ASPNETCORE_URLS=http://+:$CONTAINER_PORT \
-  -e DBOption=Postgres \
-  -e "ConnectionStrings__DefaultConnection=Host=$DB_HOST;Port=$DB_PORT;Database=$DB_NAME;Username=$DB_USER;Password=$DB_PASS" \
+  -e DBOption=MSSQL \
+  -e "ConnectionStrings__DefaultConnection=Server=$DB_HOST,$DB_PORT;Database=$DB_NAME;User Id=$DB_USER;Password=$DB_PASS;TrustServerCertificate=True;MultipleActiveResultSets=true;" \
   -e "Jwt__Secret=YourSuperSecretKeyWithAtLeast32CharactersLongForSecurity!" \
   -e "Jwt__Issuer=RollUpPlatform" \
   -e "Jwt__Audience=RollUpUsers" \
@@ -52,6 +52,6 @@ echo ""
 echo "=========================================="
 echo "✅ RollUp deployed successfully!"
 echo "📡 Local Access: http://127.0.0.1:$HOST_PORT"
-echo "🌐 Domain Target: https://rollup.eraconnect.net"
+echo "🌐 Domain Target: https://rollup-app.eraconnect.net"
 echo "=========================================="
 podman ps | grep $APP_NAME
